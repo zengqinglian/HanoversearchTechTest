@@ -25,6 +25,4 @@ E etc
 
 For each age group, the most frequently occurring awarded grade in any subject, for any student in that age group. For example for age 5 years, the most frequently awarded grade is B, for 6 it’s A, for 7 it’s B, for 8 it’s A and for 9 it’s E.
 
-1 King Street, London, EC2V 8AU, Tel: +44 (0)20 7248 2244, Fax: +44 (0)20 7248 2131, www.hanoversearch.com
-
 Please write a java (preferably java 8) based project and send as a zip file. You can structure the project and model the input/output as you choose. You can make assumptions, which can be stated in comments. Code should be extensible, it should be fairly easy to add or remove subjects from the report
