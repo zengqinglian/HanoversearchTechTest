@@ -32,6 +32,9 @@ public class ReportGenerator
 
     public Map<Integer, TestResult.GRADE> getAgeToGradeCorrelation( Map<Student, Set<TestResult>> resultSheet ) {
         Map<Integer, TestResult.GRADE> result = new HashMap<>();
+        if( resultSheet == null || resultSheet.isEmpty() ) {
+            return result;
+        }
         Map<Integer, Map<TestResult.GRADE, Integer>> count = new HashMap<>();
         resultSheet.forEach( ( k, v ) -> {
             int age = k.getAge();
@@ -39,11 +42,15 @@ public class ReportGenerator
             if( resultMap == null ) {
                 resultMap = new HashMap<>();
             }
-            for( TestResult res : v ) {
-                if( resultMap.containsKey( res.getGrade() ) ) {
-                    resultMap.put( res.getGrade(), resultMap.get( res.getGrade() ) + 1 );
-                } else {
-                    resultMap.put( res.getGrade(), 1 );
+            if( v == null || v.isEmpty() ) {
+                resultMap.put( TestResult.GRADE.F, 3 );
+            } else {
+                for( TestResult res : v ) {
+                    if( resultMap.containsKey( res.getGrade() ) ) {
+                        resultMap.put( res.getGrade(), resultMap.get( res.getGrade() ) + 1 );
+                    } else {
+                        resultMap.put( res.getGrade(), 1 );
+                    }
                 }
             }
             count.put( age, resultMap );

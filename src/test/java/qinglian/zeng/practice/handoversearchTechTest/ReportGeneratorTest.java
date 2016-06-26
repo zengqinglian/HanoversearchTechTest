@@ -118,6 +118,33 @@ public class ReportGeneratorTest
 
     @Test
     public void getAgeToGradeCorrelationTest() throws IOException {
+        // test null and test empty input
+        Map<Integer, TestResult.GRADE> resultEmpty = reporter.getAgeToGradeCorrelation( new HashMap<Student, Set<TestResult>>() );
+        assertTrue( resultEmpty.isEmpty() );
+        resultEmpty = reporter.getAgeToGradeCorrelation( null );
+        assertTrue( resultEmpty.isEmpty() );
+
+        // test default Grade f
+        Map<Student, Set<TestResult>> defaultResultSheet = new HashMap<>();
+        defaultResultSheet.put( studentA, null );
+        defaultResultSheet.put( studentB, null );
+        defaultResultSheet.put( studentC, null );
+        defaultResultSheet.put( studentD, null );
+        Map<Integer, TestResult.GRADE> defaultResult = reporter.getAgeToGradeCorrelation( defaultResultSheet );
+        assertEquals( TestResult.GRADE.F, defaultResult.get( 6 ) );
+        assertEquals( TestResult.GRADE.F, defaultResult.get( 8 ) );
+        assertEquals( TestResult.GRADE.F, defaultResult.get( 9 ) );
+
+        defaultResultSheet.put( studentA, new HashSet<TestResult>() );
+        defaultResultSheet.put( studentB, new HashSet<TestResult>() );
+        defaultResultSheet.put( studentC, new HashSet<TestResult>() );
+        defaultResultSheet.put( studentD, new HashSet<TestResult>() );
+        defaultResult = reporter.getAgeToGradeCorrelation( defaultResultSheet );
+        assertEquals( TestResult.GRADE.F, defaultResult.get( 6 ) );
+        assertEquals( TestResult.GRADE.F, defaultResult.get( 8 ) );
+        assertEquals( TestResult.GRADE.F, defaultResult.get( 9 ) );
+
+        // test normal data
         Map<Student, Set<TestResult>> resultSheet = loadTestData();
         Map<Integer, TestResult.GRADE> result = reporter.getAgeToGradeCorrelation( resultSheet );
         assertEquals( TestResult.GRADE.B, result.get( 5 ) );
@@ -125,30 +152,32 @@ public class ReportGeneratorTest
         assertEquals( TestResult.GRADE.A, result.get( 7 ) );// A and B both appeared 4 times, according to the rule, it should be A.
         assertEquals( TestResult.GRADE.A, result.get( 8 ) );
         assertEquals( TestResult.GRADE.E, result.get( 9 ) );
-        // TODO: Need to test if two grade has the same frequent case.
     }
 
-    public Map<Student, Set<TestResult>> loadTestData() throws IOException {
+    private Map<Student, Set<TestResult>> loadTestData() throws IOException {
         Map<Student, Set<TestResult>> resultSheet = new HashMap<>();
         ClassLoader loader = Test.class.getClassLoader();
         URL url = loader.getResource( testFile );
         assertNotNull( url );
         File file = new File( url.getFile() );
-        BufferedReader br = new BufferedReader( new FileReader( file ) );
-        String line = br.readLine();
 
-        while( line != null ) {
-            String[] record = line.split( "," );
-            Student stu = new Student( record[0], Integer.valueOf( record[1] ) );
-            Set<TestResult> result = new HashSet<>();
-            TestResult math = new TestResult( getTestGrade( record[2] ), SUBJECT_MATH );
-            TestResult eng = new TestResult( getTestGrade( record[3] ), SUBJECT_ENG );
-            TestResult sci = new TestResult( getTestGrade( record[4] ), SUBJECT_SCI );
-            result.add( math );
-            result.add( eng );
-            result.add( sci );
-            resultSheet.put( stu, result );
-            line = br.readLine();
+        try (BufferedReader br = new BufferedReader( new FileReader( file ) )) {
+
+            String line = br.readLine();
+
+            while( line != null ) {
+                String[] record = line.split( "," );
+                Student stu = new Student( record[0], Integer.valueOf( record[1] ) );
+                Set<TestResult> result = new HashSet<>();
+                TestResult math = new TestResult( getTestGrade( record[2] ), SUBJECT_MATH );
+                TestResult eng = new TestResult( getTestGrade( record[3] ), SUBJECT_ENG );
+                TestResult sci = new TestResult( getTestGrade( record[4] ), SUBJECT_SCI );
+                result.add( math );
+                result.add( eng );
+                result.add( sci );
+                resultSheet.put( stu, result );
+                line = br.readLine();
+            }
         }
         return resultSheet;
     }
